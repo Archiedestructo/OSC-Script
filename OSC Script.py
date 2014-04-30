@@ -14,7 +14,7 @@ try:
     import telnetlib
 except ImportError:
     os.system("osascript -e 'display dialog \"Import Error: Missing Python Library\"'")
-    os._exit(0)
+    os._exit(0) 
 
 def OSCResponse(addr, source, message):
     clnt = OSCClient()
