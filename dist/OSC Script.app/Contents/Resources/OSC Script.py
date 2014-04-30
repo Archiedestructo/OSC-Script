@@ -14,21 +14,22 @@ try:
     import telnetlib
 except ImportError:
     os.system("osascript -e 'display dialog \"Import Error: Missing Python Library\"'")
-    os._exit(0)
+    os._exit(0) 
 
-def WriteInfoConsole(addr, source, message):
-    logging.info(message)
-    
-def WriteErrorConsole(addr, source, message):
-    logging.error(message)
+def OSCResponse(addr, source, message):
+    clnt = OSCClient()
+    clientAddress = ( source[0], 53000 )
+    clnt.connect(clientAddress)
+    clnt.send( OSCMessage(addr + " " + message ) )
 
 def ScriptPath_Handler(addr, tags, data, source):
     print data[0]
     try:
         print "osascript " + data[0].replace(" ", "\\ ") + ""
         os.system("osascript " + data[0].replace(" ", "\\ ") + "")
+        OSCResponse(addr + "/Sent", source, str(data[0].replace(" ", "\\ ")))
     except:
-        print "ScriptPath_Hanlder error"
+        OSCResponse(addr + "/Error", source, sys.exc_info()[0])
 
 def ScriptCode_Handler(addr, tags, data, source):
     print data[0]
@@ -37,20 +38,22 @@ def ScriptCode_Handler(addr, tags, data, source):
         message = message.replace("'", "\"")
         p = Popen(['osascript', '-'], stdin=PIPE, stdout=PIPE, stderr=PIPE)
         stdout, stderr = p.communicate(message)
-        print (p.returncode, stdout, stderr)
+        OSCResponse(addr + "/Sent", source, str(message))
     except:
-        print "ScriptCode_Hanlder error"
+        OSCResponse(addr + "/Error", source, sys.exc_info()[0])
     
 def UDP_Handler(addr, tags, data, source):
     if (len(data) == 3):
-        print data[0]
-        print data[1]
-        print data[2]
+        OSCResponse(addr + "/IPAddress", source, str(data[0]))
+        OSCResponse(addr + "/Port", source, str(data[1]))
+        OSCResponse(addr + "/Command", source, str(data[2]))
+        
         try:
             sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
             sock.sendto(data[2].encode(encoding='UTF-8'), (str(data[0]), int(data[1])))
+            OSCResponse(addr + "/Sent", source, str(data[2]))
         except:
-            print "UDP_Handler error"
+            OSCResponse(addr + "/Error", source, sys.exc_info()[0])
 
 def Telnet_Handler(addr, tags, data, source):
     OSCResponse(addr, source, "Attempting to send Telnet Command: " + data[1])
@@ -60,25 +63,38 @@ def Telnet_Handler(addr, tags, data, source):
             tn.write(str(data[1]) + "\r")
             time.sleep(.1)
             tn.close()
-            print "Sent"
+            OSCResponse(addr + "/Sent", source, str(data[1]))
         except:
-           print "Error connecting"
+           OSCResponse(addr + "/Error", source, sys.exc_info()[0])
     else:
         try:
             tn = telnetlib.Telnet(data[0], 23, 30)
             tn.write(str(data[1]) + "\r")
             time.sleep(.1)
             tn.close()
-            print "Sent"
+            OSCResponse(addr + "/Sent", source, str(data[1]))
         except:
-           print "Error connecting"
-        
+           OSCResponse(addr + "/Error", source, sys.exc_info()[0])
+
+TelnetUsername = ""                   
+def TelnetUsername_Handler(addr, tags, data, source):
+    OSCResponse(addr, source, "Set Telnet Username: " + data[0])
+    global TelnetUsername
+    TelnetUsername = data[0]
+
+TelnetPassword = ""                   
+def TelnetPassword_Handler(addr, tags, data, source):
+    OSCResponse(addr, source, "Set Telnet Password: " + data[0])
+    global TelnetPassword
+    TelnetPassword = data[0]
+                    
 def Terminal_Handler(addr, tags, data, source):
     print data[0]
     try:
         os.system(data[0].replace("'", "\""))
+        OSCResponse(addr + "/Sent", source, str(data[0]))
     except:
-        print "Terminal_Hanlder error"
+        OSCResponse(addr + "/Error", source, sys.exc_info()[0])
         
 def Exit_Handler(addr, tags, data, source):
     print "\nClosing OSCServer."
@@ -87,14 +103,17 @@ def Exit_Handler(addr, tags, data, source):
     except:
         os._exit(0)
     os._exit(0)
-
-try:    
+    
+    
+try:
     srvr = OSCServer( ('0.0.0.0', 54000) )
     srvr.addDefaultHandlers()
     srvr.addMsgHandler("/runScript/path", ScriptPath_Handler)
     srvr.addMsgHandler("/runScript/code", ScriptCode_Handler)
     srvr.addMsgHandler("/runScript/UDP", UDP_Handler)
     srvr.addMsgHandler("/runScript/Telnet", Telnet_Handler)
+    srvr.addMsgHandler("/runScript/Telnet/SetUsername", TelnetUsername_Handler)
+    srvr.addMsgHandler("/runScript/Telnet/SetPassword", TelnetPassword_Handler)
     srvr.addMsgHandler("/runScript/Terminal", Terminal_Handler)
     srvr.addMsgHandler("/quit", Exit_Handler)
     srvr.addMsgHandler("/exit", Exit_Handler)
