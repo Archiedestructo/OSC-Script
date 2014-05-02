@@ -68,6 +68,13 @@ Once you've setup your patch, create OSC cues with a "Custom Message" rather tha
 <h3>
 <a name="welcome-to-github-pages" class="anchor" href="#welcome-to-github-pages"><span class="octicon octicon-link"></span></a>OSC Commands.</h3>
 
+<div class="CommandHeader">Quit Application</div>
+<p class="CodeDescription">This application has no menu bar, so to quit or exit the application, you'll need to send an OSC command</p>
+<pre><code>
+/quit
+/exit
+</code></pre>
+
 <div class="CommandHeader">Send Apple Script Code</div>
 <p class="CodeDescription">This command will run a chunk of Apple Script code. It's meant to be used with short snippets. If you need to use quotations, use an apostrophe. If you need nested quotations, consider using the <strong>Call Apple Script by Path</strong> command</p>
 <pre><code>
@@ -128,9 +135,40 @@ Once you've setup your patch, create OSC cues with a "Custom Message" rather tha
 /runScript/telnet/port 23
 </code></pre>
 
+<h3>
+<a name="support-or-contact" class="anchor" href="#support-or-contact"><span class="octicon octicon-link"></span></a>Troubleshooting.</h3>
+
+<p>OSC Script will send info and error messages back to QLab over OSC. To view these messages you'll first need to enable logging in QLab by going QLab/Preferences. Then selecting "2 - Some debug logging"
+<br/><br/>
+<img src="./images/Logging.png" />
+<br/><br/>
+Once this is selected, you can view the console log by opening Applications/Utilities/Console. It might help you to search for "UDP" and filter only the commands from OSC Script.</p>
 
 <h3>
-<a name="support-or-contact" class="anchor" href="#support-or-contact"><span class="octicon octicon-link"></span></a>Support or Contact</h3>
+<a name="support-or-contact" class="anchor" href="#support-or-contact"><span class="octicon octicon-link"></span></a>Customize.</h3>
+
+<p>Feel free to <a href="https://github.com/Archiedestructo/OSC-Script">visit the GitHub page</a> or <a href="https://github.com/Archiedestructo/OSC-Script/zipball/master">download the Zip</a> and alter any code you want. Everything is written in python which can be edited via IDLE. After downloading the code you'll need to install one python library.
+<br/><br/>
+Open Applications/Utilities/Terminal and copy-paste each command one by one.</p>
+<div class="CommandHeader">Install PyOSC</div>
+<pre><code>
+$ curl -O https://gitorious.org/pyosc/devel/archive/633c0112318a3519314aa798a552a092566c73c1.tar.gz
+$ cd ~/Downloads/
+$ open "633c0112318a3519314aa798a552a092566c73c1.tar.gz"
+$ cd pyosc-devel
+$ sudo python setup.py install
+ * You'll need to enter your password here *
+</code></pre>
+
+<div class="CommandHeader">Edit Code</div>
+<pre><code>
+$ sudo IDLE
+ * You'll need to enter your password here *
+</code></pre>
+From here, you can open the python script (OSC Script.py), alter, edit and run the code. 
+
+<h3>
+<a name="support-or-contact" class="anchor" href="#support-or-contact"><span class="octicon octicon-link"></span></a>Support or Contact.</h3>
 
 <p>Remember, this code is provided for you <b>as is</b>. Occasionally we can add elements, features, or try to fix bugs. Please feel free to use the app, use the code, and adapt it for yourself and your own needs. </p>
       </section>
