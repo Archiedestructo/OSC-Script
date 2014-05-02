@@ -69,37 +69,22 @@ def Telnet_Handler(addr, tags, data, source):
     global TelnetPassword
     global TelnetTimeout
     global TelnetDelay
+    global TelnetPort
     OSCResponse(addr, source, "Attempting to send Telnet Command: " + data[1])
-    if (data[0].count(" ") > 0):
-        try:
-            tn = telnetlib.Telnet(data[0].split(" ")[0], int(data[0].split(" ")[1]), TelnetTimeout)
-            if (TelnetUsername != "" and TelnetPassword != ""):
-                tn.read_until("Login:", TelnetTimeout)
-                tn.write(TelnetUsername + "\n")
-                tn.read_until("Password:", TelnetTimeout)
-                tn.write(TelnetPassword + "\n")
-            tn.write(str(data[1]) + "\r")
-            time.sleep(TelnetDelay)
-            tn.close()
-            OSCResponse(addr + "/Sent", source, str(data[1]))
-        except Exception, e:
-            print str(e)
-            OSCResponse(addr + "/Error", source, str(e))
-    else:
-        try:
-            tn = telnetlib.Telnet(data[0], 23, TelnetTimeout)
-            tn.write(str(data[1]) + "\r")
-            if (TelnetUsername != "" and TelnetPassword != ""):
-                tn.read_until("Login:", TelnetTimeout)
-                tn.write(TelnetUsername + "\n")
-                tn.read_until("Password:", TelnetTimeout)
-                tn.write(TelnetPassword + "\n")
-            time.sleep(TelnetDelay)
-            tn.close()
-            OSCResponse(addr + "/Sent", source, str(data[1]))
-        except Exception, e:
-            print str(e)
-            OSCResponse(addr + "/Error", source, str(e))
+    try:
+        tn = telnetlib.Telnet(str(data[0]), int(TelnetPort), TelnetTimeout)
+        if (TelnetUsername != "" and TelnetPassword != ""):
+            tn.read_until("Login:", TelnetTimeout)
+            tn.write(TelnetUsername + "\n")
+            tn.read_until("Password:", TelnetTimeout)
+            tn.write(TelnetPassword + "\n")
+        tn.write(str(data[1]) + "\r")
+        time.sleep(TelnetDelay)
+        tn.close()
+        OSCResponse(addr + "/Sent", source, str(data[1]))
+    except Exception, e:
+        print str(e)
+        OSCResponse(addr + "/Error", source, str(e))
 
 TelnetUsername = ""                   
 def TelnetUsername_Handler(addr, tags, data, source):
@@ -140,6 +125,16 @@ def TelnetDelay_Handler(addr, tags, data, source):
     except Exception, e:
         print str(e)
         OSCResponse(addr + "/Error", source, str(e))
+        
+TelnetPort = 23                  
+def TelnetPort_Handler(addr, tags, data, source):
+    try:
+        OSCResponse(addr, source, "Set Telnet Port: " + str(data[0]))
+        global TelnetPort
+        TelnetPort = int(data[0])
+    except Exception, e:
+        print str(e)
+        OSCResponse(addr + "/Error", source, str(e))
                     
 def Terminal_Handler(addr, tags, data, source):
     print data[0]
@@ -157,25 +152,31 @@ def Exit_Handler(addr, tags, data, source):
     except:
         os._exit(0)
     os._exit(0)
-    
+
+def noCallback_handler(addr, tags, data, source):
+    OSCResponse(addr + "/Error", source, addr + " is not a valid OSC address")
     
 try:
     srvr = OSCServer( ('0.0.0.0', 54000) )
-    srvr.addDefaultHandlers()
+    srvr.addMsgHandler("default", noCallback_handler)
     srvr.addMsgHandler("/runScript/path", ScriptPath_Handler)
     srvr.addMsgHandler("/runScript/code", ScriptCode_Handler)
     srvr.addMsgHandler("/runScript/UDP", UDP_Handler)
-    srvr.addMsgHandler("/runScript/Telnet", Telnet_Handler)
-    srvr.addMsgHandler("/runScript/Telnet/SetUsername", TelnetUsername_Handler)
-    srvr.addMsgHandler("/runScript/Telnet/SetPassword", TelnetPassword_Handler)
-    srvr.addMsgHandler("/runScript/Telnet/SetTimeout", TelnetTimeout_Handler)
-    srvr.addMsgHandler("/runScript/Telnet/SetDelay", TelnetDelay_Handler)
-    srvr.addMsgHandler("/runScript/Terminal", Terminal_Handler)
+    srvr.addMsgHandler("/runScript/telnet", Telnet_Handler)
+    srvr.addMsgHandler("/runScript/telnet/username", TelnetUsername_Handler)
+    srvr.addMsgHandler("/runScript/telnet/password", TelnetPassword_Handler)
+    srvr.addMsgHandler("/runScript/telnet/timeout", TelnetTimeout_Handler)
+    srvr.addMsgHandler("/runScript/telnet/delay", TelnetDelay_Handler)
+    srvr.addMsgHandler("/runScript/telnet/port", TelnetPort_Handler)
+    srvr.addMsgHandler("/runScript/terminal", Terminal_Handler)
     srvr.addMsgHandler("/quit", Exit_Handler)
     srvr.addMsgHandler("/exit", Exit_Handler)
 except:
     os.system("osascript -e 'display dialog \"There was an error opening the socket.\nThis may simply be because another app is using port 54000.\nIf the problem persists, please restart your computer and try again.\"'")
     os._exit(0)
+    
+    
+
 
 
 # Start OSCServer
