@@ -8,6 +8,19 @@
     <link rel="stylesheet" href="stylesheets/styles.css">
     <link rel="stylesheet" href="stylesheets/pygment_trac.css">
     <script src="javascripts/scale.fix.js"></script>
+    <style type="text/css">
+		.CommandHeader
+		{
+			font-weight: bold;
+			font-size: 16px;	
+		}
+		.CodeDescription
+		{
+			font-style: italic;
+			padding-top: 5px;
+			padding-left: 10px;	
+		}
+	</style>
     <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
     <!--[if lt IE 9]>
     <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
@@ -20,47 +33,106 @@
         <p class="header">Application to stand along side QLab, receive OSC messages, and call script commands in a separate thread</p>
 
         <ul>
+          <li class="download"><a class="buttons" href="https://github.com/Archiedestructo/OSC-Script/raw/master/OSC%20Script.zip">Download App</a></li>
           <li class="download"><a class="buttons" href="https://github.com/Archiedestructo/OSC-Script/zipball/master">Download ZIP</a></li>
-          <li class="download"><a class="buttons" href="https://github.com/Archiedestructo/OSC-Script/tarball/master">Download TAR</a></li>
           <li><a class="buttons github" href="https://github.com/Archiedestructo/OSC-Script">View On GitHub</a></li>
         </ul>
 
-        <p class="header">This project is maintained by <a class="header name" href="https://github.com/Archiedestructo">Archiedestructo</a></p>
+        <p class="header">This project is maintained by <a class="header name" href="https://github.com/Archiedestructo">Drew Schmidt</a></p>
 
 
       </header>
       <section>
         <h3>
-<a name="welcome-to-github-pages" class="anchor" href="#welcome-to-github-pages"><span class="octicon octicon-link"></span></a>Welcome to GitHub Pages.</h3>
+<a name="welcome-to-github-pages" class="anchor" href="#welcome-to-github-pages"><span class="octicon octicon-link"></span></a>Welcome to OSC Script for QLab.</h3>
 
-<p>This automatic page generator is the easiest way to create beautiful pages for all of your projects. Author your page content here using GitHub Flavored Markdown, select a template crafted by a designer, and publish. After your page is generated, you can check out the new branch:</p>
+<p>This is an application to stand alongside of application written by a QLab evangelist, not by Figure53. It can be used to perform tasks and call scripts that QLab is currently not meant to do. And because it's a separate application, heavier processes will not cause QLab to hang (i.e. A Telnet command to shutter a projector will not cause dropped frames in a video).
+<br/><br/>
+<a href="https://github.com/Archiedestructo/OSC-Script/raw/master/OSC%20Script.zip">If you just want to start you can download the application and an example QLab Workspace here.</a>
+<br/><br/>
+But before you start, be sure to read instructions on setup as well as the list of possible commands and protocalls:
+<br/><br/>
+<span style="color: #C30000;"><strong>Warning: </strong>It's possible to create potentially dangerous code. Code carefully. Code responsibly.</span></p>
 
-<pre><code>$ cd your_repo_root/repo_name
-$ git fetch origin
-$ git checkout gh-pages
+<h3>
+<a name="welcome-to-github-pages" class="anchor" href="#welcome-to-github-pages"><span class="octicon octicon-link"></span></a>Setup.</h3>
+<p>OSC Script listens for OSC commands on port 54000. Be sure to start by setting up your OSC patch in QLab with the appropriate IP Address and Port 54000. Use "localhost" if you're running this on the same computer as QLab.
+<br/><br/>
+<img src="./images/OSCPatch.png" />
+<br/><br/>
+Once you've setup your patch, create OSC cues with a "Custom Message" rather than a "QLab Message".
+<br/><br/>
+<img src="./images/OSCSettings.png" />
+</p>
+
+<h3>
+<a name="welcome-to-github-pages" class="anchor" href="#welcome-to-github-pages"><span class="octicon octicon-link"></span></a>OSC Commands.</h3>
+
+<div class="CommandHeader">Send Apple Script Code</div>
+<p class="CodeDescription">This command will run a chunk of Apple Script code. It's meant to be used with short snippets. If you need to use quotations, use an apostrophe. If you need nested quotations, consider using the <strong>Call Apple Script by Path</strong> command</p>
+<pre><code>
+/runScript/code {String}
+
+<u>Example:</u>
+/runScript/code "tell app 'finder' to sleep"
 </code></pre>
 
-<p>If you're using the GitHub for Mac, simply sync your repository and you'll see the new branch.</p>
+<div class="CommandHeader">Call Apple Script by Path</div>
+<p class="CodeDescription">Using this command, you can call a pre-written Apple Script that is saved as a *.scpt file. Curious about how to write a script? Use Applications/Utilities/AppleScriptEditor. Then save your code as a "Script" file.</p>
+<pre><code>
+/runScript/path {String}
 
-<h3>
-<a name="designer-templates" class="anchor" href="#designer-templates"><span class="octicon octicon-link"></span></a>Designer Templates</h3>
+<u>Example:</u>
+/runScript/path "~/Desktop/Go To Sleep.scpt"
+</code></pre>
 
-<p>We've crafted some handsome templates for you to use. Go ahead and continue to layouts to browse through them. You can easily go back to edit your page before publishing. After publishing your page, you can revisit the page generator and switch to another theme. Your Page content will be preserved if it remained markdown format.</p>
+<div class="CommandHeader">Run a Command in Terminal</div>
+<p class="CodeDescription">Sometimes you'll need to run a command from the OSx Terminal window. You could always use AppleScript to do this, or you can simply run one from here. Be sure to test your commands out in Terminal before creating an OSC message.</p>
+<pre><code>
+/runScript/terminal {String}
 
-<h3>
-<a name="rather-drive-stick" class="anchor" href="#rather-drive-stick"><span class="octicon octicon-link"></span></a>Rather Drive Stick?</h3>
+<u>Example:</u>
+/runScript/terminal "pmset sleepnow"
+</code></pre>
 
-<p>If you prefer to not use the automatic generator, push a branch named <code>gh-pages</code> to your repository to create a page manually. In addition to supporting regular HTML content, GitHub Pages support Jekyll, a simple, blog aware static site generator written by our own Tom Preston-Werner. Jekyll makes it easy to create site-wide headers and footers without having to copy them across every page. It also offers intelligent blog support and other advanced templating features.</p>
+<div class="CommandHeader">Send a UDP String</div>
+<p class="CodeDescription">The application will allow you to send text over a UDP connection. I like to use this to send commands to my ETC Gio lightboard. But there are plenty of options.</p>
+<pre><code>
+/runScript/UDP {String:IPAddress} {Integer:Port} {String:Command}
 
-<h3>
-<a name="authors-and-contributors" class="anchor" href="#authors-and-contributors"><span class="octicon octicon-link"></span></a>Authors and Contributors</h3>
+<u>Example:</u>
+/runScript/UDP "10.3.11.243" 7000 "$Channel 404 at 50#"
+</code></pre>
 
-<p>You can <a href="https://github.com/blog/821" class="user-mention">@mention</a> a GitHub username to generate a link to their profile. The resulting <code>&lt;a&gt;</code> element will link to the contributor's GitHub Profile. For example: In 2007, Chris Wanstrath (<a href="https://github.com/defunkt" class="user-mention">@defunkt</a>), PJ Hyett (<a href="https://github.com/pjhyett" class="user-mention">@pjhyett</a>), and Tom Preston-Werner (<a href="https://github.com/mojombo" class="user-mention">@mojombo</a>) founded GitHub.</p>
+<div class="CommandHeader">Send a Telnet Command</div>
+<p class="CodeDescription">Use the following commands to craft and send commands via Telnet. You're also given the option to specify extra parameters occasionally needed by Telnet.</p>
+<p class="CodeDescription">Username: Telnet Username [Default is nothing. Don't use this if you don't need this]</p>
+<p class="CodeDescription">Password: Telnet Password [Default is nothing. Don't use this if you don't need this]</p>
+<p class="CodeDescription">Timeout: The Number of seconds before the application will quit trying to open a connection. [Default is 30 seconds]</p>
+<p class="CodeDescription">Delay: The number of seconds between creating a connection and sending a command. Increase this value for a slow network [Default is 0.1 seconds]</p>
+<p class="CodeDescription">Port: The port overwhich Telnet commands are sent [Default is 23]</p>
+<pre><code>
+/runScript/terminal {String:IPAddress} {String:Command}
+/runScript/telnet/username {String}
+/runScript/telnet/password {String}
+/runScript/telnet/timeout {Decimal}
+/runScript/telnet/delay {Decimal}
+/runScript/telnet/port {Integer}
+
+<u>Example:</u>
+/runScript/telnet "10.3.12.66" "~0071 1"
+/runScript/telnet/username "Administrator"
+/runScript/telnet/password "1234"
+/runScript/telnet/timeout 15
+/runScript/telnet/delay 0.5
+/runScript/telnet/port 23
+</code></pre>
+
 
 <h3>
 <a name="support-or-contact" class="anchor" href="#support-or-contact"><span class="octicon octicon-link"></span></a>Support or Contact</h3>
 
-<p>Having trouble with Pages? Check out the documentation at <a href="http://help.github.com/pages">http://help.github.com/pages</a> or contact <a href="mailto:support@github.com">support@github.com</a> and we’ll help you sort it out.</p>
+<p>Remember, this code is provided for you <b>as is</b>. Occasionally we can add elements, features, or try to fix bugs. Please feel free to use the app, use the code, and adapt it for yourself and your own needs. </p>
       </section>
       <footer>
         <p><small>Hosted on <a href="http://pages.github.com">GitHub Pages</a> using the Dinky theme</small></p>
