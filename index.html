@@ -46,11 +46,9 @@
         <h3>
 <a name="welcome-to-github-pages" class="anchor" href="#welcome-to-github-pages"><span class="octicon octicon-link"></span></a>Welcome to OSC Script for QLab.</h3>
 
-<p>This is an application to stand alongside of application written by a QLab evangelist, not by Figure53. It can be used to perform tasks and call scripts that QLab is currently not meant to do. And because it's a separate application, heavier processes will not cause QLab to hang (i.e. A Telnet command to shutter a projector will not cause dropped frames in a video).
+<p>This is an application to work alongside QLab. It is written by a QLab evangelist, <i>not</i> by Figure53. It can be used to perform tasks and call scripts that QLab is currently not meant to do (i.e. UDP, telnet, terminal commands), and because it's a separate application, heavier processes will not cause QLab to hang (For example, a tTelnet command to shutter a projector will not cause dropped frames in a video running in QLab).
 <br/><br/>
-<a href="https://github.com/Archiedestructo/OSC-Script/raw/master/OSC%20Script.zip">If you just want to start you can download the application and an example QLab Workspace here.</a>
-<br/><br/>
-But before you start, be sure to read instructions on setup as well as the list of possible commands and protocalls:
+Go ahead and <a href="https://github.com/Archiedestructo/OSC-Script/raw/master/OSC%20Script.zip">download the application with an example QLab Workspace here,</a> but before you start, be sure to read instructions on setup as well as the list of possible commands and protocalls. Feeling adventurous? Feel free to download and alter the source code!
 <br/><br/>
 <span style="color: #C30000;"><strong>Warning: </strong>It's possible to create potentially dangerous code. Code carefully. Code responsibly.</span></p>
 
@@ -85,7 +83,7 @@ Once you've setup your patch, create OSC cues with a "Custom Message" rather tha
 </code></pre>
 
 <div class="CommandHeader">Call Apple Script by Path</div>
-<p class="CodeDescription">Using this command, you can call a pre-written Apple Script that is saved as a *.scpt file. Curious about how to write a script? Use Applications/Utilities/AppleScriptEditor. Then save your code as a "Script" file.</p>
+<p class="CodeDescription">Using this command, you can call a pre-written Apple Script that is saved as a *.scpt file. Never created a script? Use Applications/Utilities/AppleScriptEditor. Write what you need. Test it in the editor. Then save your code as a "Script" file.</p>
 <pre><code>
 /runScript/path {String}
 
@@ -112,12 +110,12 @@ Once you've setup your patch, create OSC cues with a "Custom Message" rather tha
 </code></pre>
 
 <div class="CommandHeader">Send a Telnet Command</div>
-<p class="CodeDescription">Use the following commands to craft and send commands via Telnet. You're also given the option to specify extra parameters occasionally needed by Telnet.</p>
-<p class="CodeDescription">Username: Telnet Username [Default is nothing. Don't use this if you don't need this]</p>
-<p class="CodeDescription">Password: Telnet Password [Default is nothing. Don't use this if you don't need this]</p>
-<p class="CodeDescription">Timeout: The Number of seconds before the application will quit trying to open a connection. [Default is 30 seconds]</p>
-<p class="CodeDescription">Delay: The number of seconds between creating a connection and sending a command. Increase this value for a slow network [Default is 0.1 seconds]</p>
-<p class="CodeDescription">Port: The port overwhich Telnet commands are sent [Default is 23]</p>
+<p class="CodeDescription">Use the following commands to craft and send commands via Telnet. There are multiple commands to help you adjust settings for your specific system.</p>
+<p class="CodeDescription"><u>Username</u>: Telnet Username [Default is nothing. Don't use this if you don't need this]</p>
+<p class="CodeDescription"><u>Password</u>: Telnet Password [Default is nothing. Don't use this if you don't need this]</p>
+<p class="CodeDescription"><u>Timeout</u>: The Number of seconds before the application will quit trying to open a connection. [Default is 30 seconds]</p>
+<p class="CodeDescription"><u>Delay</u>: The number of seconds between creating a connection and sending a command. Increase this value for a slow network [Default is 0.1 seconds]</p>
+<p class="CodeDescription"><u>Port</u>: The port overwhich Telnet commands are sent [Default is 23]</p>
 <pre><code>
 /runScript/terminal {String:IPAddress} {String:Command}
 /runScript/telnet/username {String}
